@@ -1,9 +1,6 @@
 import pygame
-import sys
 import math
 import numpy as np
-from image import *
-from box import *
 
 
 class Poligon:
@@ -30,15 +27,23 @@ class Poligon:
 
 
 class Box3D:
-    def __init__(self, screen, color=(255, 255, 255), pos=""):
+    def __init__(
+        self, screen, color=(255, 255, 255), pos=(0, 0), scale=100, angle_speed=0.01
+    ):
         self.color = color
         self.screen = screen
         self.width = screen.get_rect()[2]
         self.height = screen.get_rect()[3]
-        self.pos = (self.width / 2 - 50, self.height / 2 - 50) if pos == "" else pos
+        self.scale = scale
+        self.pos = (
+            self.width / 2 - self.scale / 2 if pos[0] == 0 else pos[0] - self.scale / 2,
+            self.height / 2 - self.scale / 2
+            if pos[1] == 0
+            else pos[1] - self.scale / 2,
+        )
 
-        self.scale = 100
         self.points = []
+        self.angle_speed = angle_speed
         self.angle = 0
         p = 1
         self.points.append(Poligon([-p, -p, p]))
@@ -65,8 +70,12 @@ class Box3D:
         self.points.append(Poligon([0, 0, -p], [13, 4, 5, 6, 7]))
 
         self.points_l = []
-        self.points_l.append(np.matrix([0, 0, -2]))
-        self.points_l.append(np.matrix([0, 0, 3]))
+        self.points_l.append(np.matrix([0, 0, -10]))
+        self.points_l.append(np.matrix([0, 0, -10]))
+        self.points_l.append(np.matrix([0, 0, 10]))
+        self.points_l.append(np.matrix([0, 0, -10]))
+
+        self.rgbs_old_value = (0, 0, 0)
 
     def x_matrix(self):
         return np.matrix(
@@ -114,33 +123,26 @@ class Box3D:
 
     def rgbs(self, r, g, b, thetas):
         for theta in thetas:
-            r -= theta * 100
-            g -= theta * 100
-            b -= theta * 100
-        return (
-            int(r if r > 0 else 0),
-            int(g if g > 0 else 0),
-            int(b if b > 0 else 0),
+            if theta != 0:
+                r -= theta * 100 - 50 * 2.5
+                g -= theta * 100 - 50 * 2.5
+                b -= theta * 100 - 50 * 2.5
+            else:
+                return self.rgbs_old_value
+
+        self.rgbs_old_value = (
+            int(r if r > 0 and r < 255 else 0 if r < 0 else 255),
+            int(g if g > 0 and g < 255 else 0 if g < 0 else 255),
+            int(b if b > 0 and b < 255 else 0 if b < 0 else 255),
         )
+        return self.rgbs_old_value
 
     def blit(self):
-        self.angle += 0.01
+        self.angle += self.angle_speed
         for i in self.points:
             i.dot([self.x_matrix(), self.y_matrix(), self.z_matrix()])
             i.point2D[0][0] = (int(i.point2D[0][0] * self.scale) + self.pos[0],)
             i.point2D[1][0] = (int(i.point2D[1][0] * self.scale) + self.pos[1],)
-            # pygame.draw.circle(
-            #     self.screen,
-            #     (0, 0, 0),
-            #     i.get(),
-            #     5,
-            # )
-        # pygame.draw.circle(
-        #     self.screen,
-        #     (255, 255, 255),
-        #     (self.width - 200, 200),
-        #     100,
-        # )
 
         points_l = []
         for i in range(len(self.points_l)):
@@ -158,46 +160,32 @@ class Box3D:
                 int(projected2d[1][0]) + 200,
             )
         )
-        # points_l.append(
-        #     (
-        #         int(projected2d[0][0]) + self.width - 1500,
-        #         int(projected2d[1][0]) + 600,
-        #     )
-        # )
-        # pygame.draw.circle(
-        #     self.screen,
-        #     (255, 255, 0),
-        #     points_l[0],
-        #     20,
-        # )
-        # pygame.draw.circle(
-        #     self.screen,
-        #     (255, 255, 0),
-        #     points_l[1],
-        #     20,
-        # )
+        points_l.append(
+            (
+                int(projected2d[0][0]) + 200,
+                int(projected2d[1][0]) + self.height - 200,
+            )
+        )
+        points_l.append(
+            (
+                int(projected2d[0][0]) + 200,
+                int(projected2d[1][0]) + 200,
+            )
+        )
+        points_l.append(
+            (
+                int(projected2d[0][0]) + self.width - 200,
+                int(projected2d[1][0]) + self.height - 200,
+            )
+        )
 
-        # pygame.draw.circle(
-        #     self.screen,
-        #     (255, 255, 255),
-        #     (self.width - 200, 200),
-        #     100,
-        # )
 
-        # for i in range(8, 14):
-        #     pygame.draw.line(
+        # for point_l in points_l:
+        #     pygame.draw.circle(
         #         self.screen,
         #         (255, 255, 0),
-        #         self.points[i + 6].get(),
-        #         points_l[-1],
-        #         2,
-        #     )
-        #     pygame.draw.line(
-        #         self.screen,
-        #         (255, 255, 0),
-        #         self.points[i].get(),
-        #         self.points[i + 6].get(),
-        #         2,
+        #         point_l,
+        #         20,
         #     )
 
         arr = self.points
@@ -215,22 +203,3 @@ class Box3D:
                     self.points[poligon[4]].get(),
                 ],
             )
-
-        i = 11
-        # pygame.draw.line(
-        #     self.screen,
-        #     (0, 0, 255),
-        #     self.points[i].get(),
-        #     self.points[i + 6].get(),
-        #     3,
-        # )
-
-        # # pygame.draw.circle(
-        # #     self.screen,
-        # #     (0, 0, 255),
-        # #     point[-1],
-        # #     5,
-        # # )
-
-        # pygame.display.flip()
-        # self.clock.tick(60)  # limits FPS to 60
