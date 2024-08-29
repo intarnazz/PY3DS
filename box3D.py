@@ -71,9 +71,9 @@ class Box3D:
 
         self.points_l = []
         self.points_l.append(np.matrix([0, 0, -10]))
-        self.points_l.append(np.matrix([0, 0, -10]))
-        self.points_l.append(np.matrix([0, 0, 10]))
-        self.points_l.append(np.matrix([0, 0, -10]))
+        # self.points_l.append(np.matrix([0, 0, -10]))
+        # self.points_l.append(np.matrix([0, 0, 10]))
+        # self.points_l.append(np.matrix([0, 0, -10]))
 
         self.rgbs_old_value = (0, 0, 0)
 
@@ -160,24 +160,24 @@ class Box3D:
                 int(projected2d[1][0]) + 200,
             )
         )
-        points_l.append(
-            (
-                int(projected2d[0][0]) + 200,
-                int(projected2d[1][0]) + self.height - 200,
-            )
-        )
-        points_l.append(
-            (
-                int(projected2d[0][0]) + 200,
-                int(projected2d[1][0]) + 200,
-            )
-        )
-        points_l.append(
-            (
-                int(projected2d[0][0]) + self.width - 200,
-                int(projected2d[1][0]) + self.height - 200,
-            )
-        )
+        # points_l.append(
+        #     (
+        #         int(projected2d[0][0]) + 200,
+        #         int(projected2d[1][0]) + self.height - 200,
+        #     )
+        # )
+        # points_l.append(
+        #     (
+        #         int(projected2d[0][0]) + 200,
+        #         int(projected2d[1][0]) + 200,
+        #     )
+        # )
+        # points_l.append(
+        #     (
+        #         int(projected2d[0][0]) + self.width - 200,
+        #         int(projected2d[1][0]) + self.height - 200,
+        #     )
+        # )
 
 
         # for point_l in points_l:
