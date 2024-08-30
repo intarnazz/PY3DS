@@ -7,7 +7,7 @@ class ProgectLavel:
     def __init__(self):
         pygame.init()
 
-        self.bgcolor = (50, 50, 50)
+        self.bgcolor = (0, 120, 56)
         self.clock = pygame.time.Clock()
         info = pygame.display.Info()
 
